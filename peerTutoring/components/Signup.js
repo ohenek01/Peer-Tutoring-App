@@ -20,9 +20,9 @@ export default function SignUp() {
         axios.post("http://localhost:5001/register", userData)
         .then(res => {
             console.log(res.data);
-            if(res.data.status === "ok"){
+            if(res.data.status === "Ok"){
                 alert("Sign Up successful")
-                navigate.replace('Login', {fname});
+                navigate.replace('Role', {fname});
             }else{
                 console.log("Error:", res.data.data || "Unexpected response");
                 alert(res.data.data || "Registration failed");
@@ -78,10 +78,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    backgroundImage:{
-        marginTop: 50,
-        height: 900
-    },
     formContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -115,7 +111,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 50,
         color: 'black',
-        fontWeight: 'bold',
+        fontWeight: '900',
         textAlign: 'center',
         marginBottom: 50
     },

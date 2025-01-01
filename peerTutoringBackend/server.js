@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 
 //register user
 app.post('/register', async(req, res) => {
-    const { fname, lname, email, password } = req.body;
+    const { fname, lname, email, password, role, level, course, expertise, note } = req.body;
 
     //validate input
     if(!fname|| !lname|| !email|| !password){
