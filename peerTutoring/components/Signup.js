@@ -10,29 +10,11 @@ export default function SignUp() {
     const [lname, setLname] = useState('');
     const navigate = useNavigation();
 
-    const handleSubmit = () => {
-        const userData = {
-            fname: fname,
-            lname: lname,
-            email,
-            password,
-        };
-        axios.post("http://localhost:5001/register", userData)
-        .then(res => {
-            console.log(res.data);
-            if(res.data.status === "Ok"){
-                alert("Sign Up successful")
-                navigate.replace('Role', {fname});
-            }else{
-                console.log("Error:", res.data.data || "Unexpected response");
-                alert(res.data.data || "Registration failed");
-            }
-        })
-        .catch(e => {
-            console.log("Error:", e.message);
-            alert("Email already exists. Please try again!");
-        })
-        
+    const handleSubmit = () => {    
+        if(!fname || !lname || !email || !password){
+            alert('Please fill in all fields')
+        }
+        navigate.navigate('Role', { fname, lname, email, password });
     };
 
     return (

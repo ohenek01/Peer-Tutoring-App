@@ -22,7 +22,8 @@ app.get('/', (req, res) => {
 
 //register user
 app.post('/register', async(req, res) => {
-    const { fname, lname, email, password, role, level, course, expertise, note } = req.body;
+    const { fname, lname, email, password, role, } = req.body;
+    console.log('Received payload:', req.body);
 
     //validate input
     if(!fname|| !lname|| !email|| !password){
@@ -45,11 +46,7 @@ app.post('/register', async(req, res) => {
             lname: lname,
             email: email,
             password: encryptedPassword,
-            role,
-            level,
-            course,
-            expertise: role === 'Tutor' ? expertise : undefined,
-            note: role === 'Tutor' ? note : undefined
+            role, 
         });
 
         return res.send({status: "Ok", data: "User created"})
@@ -57,7 +54,7 @@ app.post('/register', async(req, res) => {
         console.error(error)
         res.status(500).send({status: "Error", data: error.message})
     }
-})    
+})   
 
 //login user
 app.post('/login', async (req, res) => {
@@ -78,7 +75,8 @@ app.post('/login', async (req, res) => {
         if(!isPasswordValid) return res.status(400).send({status: "Error", data: "Invalid Password"})
 
         const token = jwt.sign({email: userExists.email}, process.env.JWT_SECRET, {expiresIn: '1h'});
-        res.json({ token })
+        if(res.status(200)){
+            return res.send({status: 'Ok', data: token})}
     } catch (error) {
         res.status(500).send('Error Logging In')
     }
@@ -86,19 +84,19 @@ app.post('/login', async (req, res) => {
 
 //update profile
 app.put('/profile', async (req, res) => {
-    const {fname, lname, email, level, course, expertise, note} = req.body;
+    const {fname, lname, email, level, course, } = req.body;
 
     try {
         const updateUser = await User.findOneAndUpdate(
             {email},
-            {fname, lname, level, course, expertise, note},
+            {fname, lname, level, course, },
             {new: true}
         );
         
         if(!updateUser){
             return res.status(404).send({ status: "Error", data: "User not found" });
         }
-        res.status(200).send({status: "Ok", data: updateUser})
+        res.status(200).send({status: 'Ok', data: updateUser})
     } catch (error) {
         res.status(500).send({status: "Error", data: "Error updating profile"})
     }

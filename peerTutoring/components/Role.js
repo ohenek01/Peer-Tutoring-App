@@ -2,27 +2,36 @@ import React, { useState } from 'react'
 import { View, StyleSheet, Text, StatusBar, TouchableOpacity, Alert } from 'react-native'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
-export default function Role() {
+export default function Role({ route }) {
+    const navigate = useNavigation();
     const [role, setRole] = useState('');
+    const { fname, lname, email, password } = route.params;
 
     const handleSubmit = () => {
       if(!role){
         Alert.alert('Error', 'Please select a role');
         return;
       }
-      const Roles = {role};
+      const userData = {
+        fname,
+        lname,
+        email,
+        password,
+        role
+      }
 
-      axios.post('http://localhost:5001/register', Roles)
+      axios.post('http://localhost:5001/register', userData)
       .then(res => {
         if(res.data.status === 'Ok'){
-          Alert.alert('Success', 'Role selected Successfully')
-          //navigation
+          Alert.alert('Success', 'Registration completed')
+          navigate.replace('Login', { fname, lname, role })
         }else{
           Alert.alert('Error', res.data.data || 'Failed to register role');
         }
       })
-      .catch(error =>{
+      .catch(error => {
         console.error(error);
         Alert.alert('Error', 'Somethimg went wrong')
       });

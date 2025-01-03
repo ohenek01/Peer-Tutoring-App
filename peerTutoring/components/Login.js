@@ -1,11 +1,60 @@
-import React from 'react'
-import { StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react'
+import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import axios from 'axios';
 
-export default function Login() {
+export default function Login( {route} ) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const {role, lname, fname} = route.params;
+  const navigate = useNavigation();
+
+  const handleSubmit = () => {
+      const userData ={
+        email: email,
+        password: password
+      }
+      axios.post('http://localhost:5001/login', userData)
+      .then(res => {
+        console.log(res.data);
+        if(res.data.status === 'Ok'){
+          alert('Login Successful');
+          if (role === 'Tutor') {
+            navigate.navigate('Tutor-Profile', { fname, lname, email })
+          }else{
+            navigate.navigate('Profile', { fname, lname, email });
+          }
+        }else{
+          alert('Invalid credentials')
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Something went wrong')
+      })
+  }
+
   return (
-    <div>
-      
-    </div>
+    <View style={styles.container}>
+      <Text style={styles.texts}>Log In</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Email'
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder='Password'
+        value={password}
+        secureTextEntry={true}
+        onChangeText={setPassword}
+      />
+      <Text style={styles.forgotPassword}>Forgot password?</Text>
+      <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+        <Text style={styles.smallTexts}>Login</Text>
+      </TouchableOpacity>
+    </View>
   )
 }
 
@@ -16,5 +65,41 @@ const styles = StyleSheet.create({
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    texts:{
+      color: '#000000',
+      fontSize: 50,
+      fontWeight: '900',
+      marginBottom: 40
+    },
+    input: {
+      borderColor: '#000000',
+      height: 60,
+      borderWidth: 1,
+      marginTop: 50,
+      paddingLeft: 10,
+      borderRadius: 9,
+      width: '90%',
+      backgroundColor: '#d9d9d9',
+    },
+    forgotPassword: {
+      color: 'black',
+      marginBottom: 20,
+      marginTop: 20,
+      marginLeft: 250,
+      fontStyle: 'italic',
+    },
+    button:{
+      width: 150,
+      height: 50,
+      marginTop: 40,
+      backgroundColor: '#000000',
+      borderRadius: 7,
+    },
+    smallTexts:{
+      fontWeight: 'bold',
+      color: '#ffffff',
+      textAlign: 'center',
+      marginTop: 18
     },
   });
