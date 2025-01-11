@@ -108,9 +108,10 @@ const styles = StyleSheet.create({
     },
     smallTexts1:{
         fontWeight: 'bold',
-        color: '#d2d2d2',
+        color: 'black',
         textAlign: 'center',
-        marginTop: 18
+        marginTop: 18,
+        marginLeft: 30
     },
     button:{
         width: 120,

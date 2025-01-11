@@ -16,7 +16,7 @@ export default function Login( {route} ) {
     };
 
     try {
-        const res = await axios.post('http://localhost:5001/login', userData);
+        const res = await axios.post('http://172.20.10.6:5001/login', userData);
 
         // Log response for debugging
         console.log(res.data);
@@ -31,9 +31,9 @@ export default function Login( {route} ) {
 
             // Navigate based on role
             if (role === 'Tutor') {
-                navigate.navigate('Tutor-Profile', {email}); 
+                navigate.replace('Tutor-Profile', {email}); 
             } else {
-                navigate.navigate('Profile', {email});
+                navigate.replace('Profile', {email});
             }
         } else {
             alert('Invalid credentials');

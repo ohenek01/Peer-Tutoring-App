@@ -22,7 +22,7 @@ export default function Role({ route }) {
         role
       }
 
-      axios.post('http://localhost:5001/register', userData)
+      axios.post('http://172.20.10.6:5001/register', userData)
       .then(res => {
         if(res.data.status === 'Ok'){
           Alert.alert('Success', 'Registration completed')

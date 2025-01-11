@@ -7,6 +7,7 @@ import Signup from './components/Signup';
 import Role from './components/Role';
 import Profile from './components/Profile';
 import Tutorprofile from './components/Tutorprofile';
+import SearchPage from './components/SearchPage';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,7 @@ export default function App() {
         <Stack.Screen name='Welcome' component={Welcome} options={{headerShown: false}}/>
         <Stack.Screen name='Home' component={Home} options={{headerShown: false}}/>
         <Stack.Screen name='Login' component={Login} options={{headerShown: false}}/>
+        <Stack.Screen name='Search' component={SearchPage} options={{headerShown: false}}/>
         <Stack.Screen name='SignUp' component={Signup} options={{headerShown: false}}/>
         <Stack.Screen name='Role' component={Role} options={{headerShown: false}}/>
         <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>

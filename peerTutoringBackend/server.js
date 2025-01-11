@@ -127,6 +127,17 @@ app.get('/profile', async(req,res) => {
     }
 })
 
+app.get('/tutors', async(req, res) => {
+    
+    try {
+        const tutors = await User.find({role: /tutor/i }).lean()
+        res.status(201).send({status: 'Ok', data: tutors})
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({status: 'Error', data: 'Server Error'})
+    }
+})
+
 app.listen(5001, () => {
     console.log("Server has Started")
 })
