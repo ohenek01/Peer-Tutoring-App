@@ -8,8 +8,8 @@ const schema = new mongoose.Schema({
     role: {type: String, enum: ['Tutor', 'Learner'], },
     level: {type: String},
     course: {type: String},
-    // expertise: {type: String},
-    // note: {type: String}
+    expertise: {type: String},
+    availability: { type: [String] },
 },{
     collection: "userInfo",
     timestamps: true

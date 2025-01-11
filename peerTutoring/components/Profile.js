@@ -1,12 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { View, StyleSheet, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Profile({ route }) {
-  const {fname, lname, email} = route.params;
+  const { email } = route.params;
   const [level, setLevel] = useState('');
   const [course, setCourse] = useState('');
+  const [userData, setUserData] = useState(null);
+  const navigation = useNavigation();
 
   const handleSubmit = () => {
     if(!level || !course){
@@ -14,13 +18,13 @@ export default function Profile({ route }) {
       return;
     }
 
-    const userData = {fname, lname, email, level, course};
+    const userData = { email, level, course};
 
     axios.put('http://localhost:5001/profile', userData)
     .then(res => {
       if(res.data.status === 'Ok'){
         Alert.alert('Successful', 'Welcome!')
-        //navigation
+        navigation.replace('Home');
       }
     })
     .catch(error => {
@@ -28,13 +32,44 @@ export default function Profile({ route }) {
       Alert.alert('Error', 'Something went wrong')
     })
   }
+
+  const fetchUserProfile = async() => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if(!token){
+        throw new Error('Token not found');
+      }
+      const res = await axios.get('http://localhost:5001/profile', {
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return res.data.data;
+    } catch (error) {
+      console.error('Error fetching user data', error)
+      throw error;
+    }
+  }
+
+  useEffect(() => {
+    const loadData = async() => {
+      const data = await fetchUserProfile();
+      setUserData(data);
+    };
+    loadData();
+  }, []);
+
+  if(!userData){
+    return <Text style={styles.smallTexts}>No user data found</Text>
+  }
+
   return (
     <View style={styles.container}>
         <Text style={styles.texts}>Profile</Text>
         <FontAwesome style={styles.icon}name="user-circle-o" size={100} color="black" />
         <Text style={styles.smallTexts}>Name:</Text>
         <TextInput style={styles.input}
-          value={`${fname} ${lname}`}
+          value={`${userData.fname} ${userData.lname}`}
         />
         <Text style={styles.smallTexts}>Level:</Text>
         <TextInput style={styles.input}

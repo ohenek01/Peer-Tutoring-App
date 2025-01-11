@@ -76,7 +76,7 @@ app.post('/login', async (req, res) => {
 
         const token = jwt.sign({email: userExists.email}, process.env.JWT_SECRET, {expiresIn: '1h'});
         if(res.status(200)){
-            return res.send({status: 'Ok', data: token})}
+            return res.send({status: 'Ok', data: {token:token, role:userExists.role}})}
     } catch (error) {
         res.status(500).send('Error Logging In')
     }
@@ -84,12 +84,12 @@ app.post('/login', async (req, res) => {
 
 //update profile
 app.put('/profile', async (req, res) => {
-    const {fname, lname, email, level, course, } = req.body;
+    const { email, level, course, expertise, availability} = req.body;
 
     try {
         const updateUser = await User.findOneAndUpdate(
             {email},
-            {fname, lname, level, course, },
+            { level, course, expertise, availability},
             {new: true}
         );
         
@@ -99,6 +99,31 @@ app.put('/profile', async (req, res) => {
         res.status(200).send({status: 'Ok', data: updateUser})
     } catch (error) {
         res.status(500).send({status: "Error", data: "Error updating profile"})
+    }
+});
+
+app.get('/profile', async(req,res) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+
+    if(!token){
+        return res.status(401).send({status: 'Error' ,data: 'Authorization token required'});
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findOne({email: decoded.email}).select('-password');
+        if(!user){
+            return res.status(404).send({status: 'Error', data: 'User not found'});
+        }
+        return res.status(201).send({status: 'Ok', data: user})
+    } catch (error) {
+        if(error.name === 'JsonWebTokenError'){
+            return res.status(401).send({status: 'Error', data: 'Invalid Token'})
+        }
+        if(error.name === 'TokenExpiredError'){
+            return res.status(401).send({status: 'Error', data: 'Token Expired'})
+        }
+        res.status(500).send({status: 'Error', data: 'Error fetching details'})
     }
 })
 

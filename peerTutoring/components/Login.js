@@ -2,37 +2,47 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react'
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login( {route} ) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const {role, lname, fname} = route.params;
   const navigate = useNavigation();
 
-  const handleSubmit = () => {
-      const userData ={
+  const handleSubmit = async () => {
+    const userData = {
         email: email,
-        password: password
-      }
-      axios.post('http://localhost:5001/login', userData)
-      .then(res => {
+        password: password,
+    };
+
+    try {
+        const res = await axios.post('http://localhost:5001/login', userData);
+
+        // Log response for debugging
         console.log(res.data);
-        if(res.data.status === 'Ok'){
-          alert('Login Successful');
-          if (role === 'Tutor') {
-            navigate.navigate('Tutor-Profile', { fname, lname, email })
-          }else{
-            navigate.navigate('Profile', { fname, lname, email });
-          }
-        }else{
-          alert('Invalid credentials')
+
+        if (res.data.status === 'Ok') {
+            const {token, role} = res.data.data;
+
+            // Save token to AsyncStorage
+            await AsyncStorage.setItem('userToken', token);
+
+            alert('Login Successful');
+
+            // Navigate based on role
+            if (role === 'Tutor') {
+                navigate.navigate('Tutor-Profile', {email}); 
+            } else {
+                navigate.navigate('Profile', {email});
+            }
+        } else {
+            alert('Invalid credentials');
         }
-      })
-      .catch(error => {
-        console.error(error);
-        alert('Something went wrong')
-      })
-  }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Something went wrong');
+    }
+};
 
   return (
     <View style={styles.container}>

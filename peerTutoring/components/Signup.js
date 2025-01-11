@@ -13,8 +13,8 @@ export default function SignUp() {
     const handleSubmit = () => {    
         if(!fname || !lname || !email || !password){
             alert('Please fill in all fields')
-        }
-        navigate.navigate('Role', { fname, lname, email, password });
+        }else{
+        navigate.navigate('Role', { fname, lname, email, password });}
     };
 
     return (
@@ -49,6 +49,9 @@ export default function SignUp() {
                 />
                 <TouchableOpacity onPress={handleSubmit} style={styles.button}>
                     <Text style={styles.smallTexts}>Sign Up</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigate.navigate('Login')}>
+                    <Text style={styles.smallTexts1}>Already have an account?</Text>
                 </TouchableOpacity>
                 <StatusBar barStyle="dark-content" />
         </View>           
@@ -100,6 +103,12 @@ const styles = StyleSheet.create({
     smallTexts:{
         fontWeight: 'bold',
         color: '#ffffff',
+        textAlign: 'center',
+        marginTop: 18
+    },
+    smallTexts1:{
+        fontWeight: 'bold',
+        color: '#d2d2d2',
         textAlign: 'center',
         marginTop: 18
     },
