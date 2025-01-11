@@ -138,6 +138,23 @@ app.get('/tutors', async(req, res) => {
     }
 })
 
+app.get('/search', async(req, res) => {
+    const { expertise } = req.query;
+    if(!expertise){
+        return res.status(400).send({status: 'Error', data: 'Expertise is required'})
+    }
+    try {
+        const tutors = await User.find({expertise: {$regex: expertise, $options: 'i'}});
+        if(tutors.length === 0){
+            return res.status(404).send({status: 'Error', data: 'No tutors found for this subject'})
+        }
+        res.status(201).send({status: 'Ok', data: tutors});
+    } catch (error) {
+        console.error(error)
+        res.status(500).send({status: 'Error', data: 'Server Error'})
+    }
+})
+
 app.listen(5001, () => {
     console.log("Server has Started")
 })

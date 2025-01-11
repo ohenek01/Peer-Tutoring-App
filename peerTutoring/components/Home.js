@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, View, Text, StatusBar, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Entypo from '@expo/vector-icons/Entypo';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -70,8 +71,9 @@ export default function Home(route) {
         <Text style={styles.placeholder}>Search...</Text>
       </View>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity style={styles.subContainer} onPress={() => navigation.navigate('TutorPage')}>
         <Text style={styles.subHeading}>Recommended Tutors</Text>
+        <Entypo name="chevron-down" size={24} color="black" style={styles.subIcon}/>
       </TouchableOpacity>
       <FlatList
       horizontal
@@ -121,8 +123,15 @@ const styles = StyleSheet.create({
     },
     subHeading:{
       fontWeight: 'bold',
-      marginTop: 40,
+      marginTop: 35,
       marginLeft: 20
+    },
+    subContainer:{
+      flexDirection: 'row',
+      justifyContent: 'space-between'
+    },
+    subIcon:{
+      marginTop: 30
     },
     icon1:{
       position: 'absolute',
