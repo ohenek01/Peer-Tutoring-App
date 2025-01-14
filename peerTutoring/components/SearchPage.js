@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, TextInput, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, Platform,TextInput, Text, TouchableOpacity, FlatList } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
@@ -46,7 +46,7 @@ export default function SearchPage() {
         keyExtractor={(item) => item._id}
         numColumns={2}
         renderItem={({item}) => (
-            <TouchableOpacity style={styles.tutorCard}>
+            <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item})} style={styles.tutorCard}>
                 <FontAwesome name='user-circle-o' style={styles.icon2} size={24}/>
                 <Text style={styles.text1}>{item.fname}</Text>
                 <Text>{item.level}</Text>
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     header:{
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: Platform.OS === 'android' ? -40 : undefined
     },
     icon:{
         marginTop: 70
@@ -90,6 +91,7 @@ const styles = StyleSheet.create({
         height: 53,
         borderWidth: 1,
         marginTop: 20,
+        marginBottom: 20,
         paddingLeft: 40,
         borderRadius: 30,
         width: '90%',
@@ -97,20 +99,19 @@ const styles = StyleSheet.create({
       },
       icon1:{
         position: 'absolute',
-        top: '62%',
+        top: '52%',
         left: 18,
-        transform: [{ translateY: -10 }],
+        transform: [{ translateY: -12 }],
         zIndex: 1
       },
       tutorCard:{
-        flex: 1,
         width: 188,
         height: 162,
         backgroundColor: '#d9d9d9',
         borderRadius: 45,
         paddingLeft: 20,
         justifyContent: 'center',
-        margin: 10
+        margin: 10,
     },
     text1:{
         fontWeight: 'bold',

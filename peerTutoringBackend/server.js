@@ -3,19 +3,35 @@ const app = express();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Pusher = require('pusher');
 require('dotenv').config();
-
-app.use(express.json());
-
-//Database Connection
-mongoose.connect(process.env.MONGO_URL)
-.then(() => console.log("MongoDb Connected"))
-.catch(() => console.log("MongoDb not connected"))
 
 //calling the schema
 require('./schema')
 const User = mongoose.model("userInfo");
 
+//calling message Schema
+require('./messageSchema')
+const Message = mongoose.model('Message')
+
+
+app.use(express.json());
+
+//pusher secret keys
+const pusher = new Pusher({
+    appId: process.env.app_id,
+    key: process.env.key,
+    secret: process.env.secret,
+    cluster: process.env.cluster,
+    useTLS: true,
+})
+
+ //Database Connection
+mongoose.connect(process.env.MONGO_URL)
+.then(() => console.log("MongoDb Connected"))
+.catch(() => console.log("MongoDb not connected"))
+
+//server started
 app.get('/', (req, res) => {
     res.send({status: "Started"})
 })
@@ -102,6 +118,7 @@ app.put('/profile', async (req, res) => {
     }
 });
 
+//fetch user details
 app.get('/profile', async(req,res) => {
     const token = req.headers['authorization']?.split(' ')[1];
 
@@ -127,6 +144,7 @@ app.get('/profile', async(req,res) => {
     }
 })
 
+// fetch tutor details
 app.get('/tutors', async(req, res) => {
     
     try {
@@ -138,6 +156,18 @@ app.get('/tutors', async(req, res) => {
     }
 })
 
+//fetch learner details
+app.get('/learners', async (req, res) => {
+    try {
+        const learners = await User.find({role: /learner/i}).lean()
+        res.status(201).send({status: 'Ok', data: learners})
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({status: 'Error', data: 'Server Error'})
+    }
+})
+
+// search functionality
 app.get('/search', async(req, res) => {
     const { expertise } = req.query;
     if(!expertise){
@@ -152,6 +182,41 @@ app.get('/search', async(req, res) => {
     } catch (error) {
         console.error(error)
         res.status(500).send({status: 'Error', data: 'Server Error'})
+    }
+})
+
+// send a message
+app.post('/message', async(req, res) => {
+    const { sender, receiver, message } = req.body;
+
+    try{
+    const newMessage = await Message.create({
+        sender, message, receiver
+    })
+    pusher.trigger(`private-chat-${sender}-${receiver}`, 'new-message',{
+        sender: sender,
+        receiver: receiver,
+        message: message
+    });
+    res.send({status: 'Message sent', data: newMessage})
+}catch(error){
+    console.error('Error sending message:', error)
+    res.status(500).send({ status: 'Error', data: 'Failed to send message' })
+}
+});
+
+app.get('/message', async (req, res) => {
+    const { sender, receiver } = req.query;
+    try {
+        const message = await Message.find({
+            $or:[
+                { sender, receiver },
+                { sender: sender, receiver: receiver, }
+            ],
+        }).sort({ timeStamp: 1 })
+    } catch (error) {
+        console.error('Error fetching messages:', error)
+        res.status(500).send({status: 'Error', data: 'Failed to fetch messages'})
     }
 })
 

@@ -9,6 +9,8 @@ import Profile from './components/Profile';
 import Tutorprofile from './components/Tutorprofile';
 import SearchPage from './components/SearchPage';
 import TutorPage from './components/TutorPage';
+import TutorDetailScreen from './components/TutorDetailScreen';
+import ChatScreen from './components/ChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -25,6 +27,8 @@ export default function App() {
         <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>
         <Stack.Screen name='Tutor-Profile' component={Tutorprofile} options={{headerShown: false}}/>
         <Stack.Screen name='TutorPage' component={TutorPage} options={{headerShown: false}}/>
+        <Stack.Screen name='TutorDetailScreen' component={TutorDetailScreen} options={{headerShown: false}}/>
+        <Stack.Screen name='ChatScreen' component={ChatScreen} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

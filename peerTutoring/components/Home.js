@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { ScrollView, StyleSheet, View, Text, StatusBar, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { Platform, StyleSheet, View, Text, StatusBar, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import axios from 'axios';
@@ -77,10 +77,11 @@ export default function Home(route) {
       </TouchableOpacity>
       <FlatList
       horizontal
+      showsHorizontalScrollIndicator={false}
       data={tutor}
       keyExtractor={(item) => item._id}
       renderItem={({item}) => (
-        <TouchableOpacity style={styles.tutorCard}>
+        <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item})} style={styles.tutorCard}>
           <FontAwesome style={styles.icon2} name='user-circle-o' size={24}/>
           <Text style={styles.text1}>{item.fname}</Text>
           <Text style={styles.texts}>{item.level}</Text>
@@ -101,6 +102,7 @@ const styles = StyleSheet.create({
     header:{
       flexDirection: 'row',  
       alignItems: 'center',  
+      marginTop: Platform.OS === 'android' ? -40 : undefined
     },
     title: {
       fontSize: 40,

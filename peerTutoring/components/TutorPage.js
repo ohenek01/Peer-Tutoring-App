@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
+import { StyleSheet, Platform, TouchableOpacity, View, Text, FlatList } from 'react-native';
 import axios from 'axios';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -34,7 +34,7 @@ export default function TutorPage() {
         keyExtractor={(item) => item._id}
         numColumns={2}
         renderItem={({item}) => (
-            <TouchableOpacity style={styles.tutorCard}>
+            <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item})} style={styles.tutorCard}>
                 <FontAwesome name='user-circle-o' style={styles.icon1} size={24}/>
                 <Text style={styles.text1}>{item.fname}</Text>
                 <Text>{item.level}</Text>
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     header:{
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: Platform.OS === 'android' ? -40 : undefined
     },
     title: {
         fontSize: 30,
@@ -68,7 +69,6 @@ const styles = StyleSheet.create({
         marginTop: 70
     },
     tutorCard:{
-        flex: 1,
         width: 188,
         height: 162,
         backgroundColor: '#d9d9d9',
