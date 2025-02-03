@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Platform, StyleSheet, View, Text, StatusBar, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { Platform, StyleSheet, View, Text, StatusBar, TextInput, TouchableOpacity, FlatList,ScrollView } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import SearchPage from './SearchPage';
 
 export default function Home(route) {
   const [userData, setUserData] = useState(null);
@@ -54,13 +55,13 @@ export default function Home(route) {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <FontAwesome style={styles.icon} name="user-circle-o" size={50} color="black" />
         <Text style={styles.title}>Home</Text>
       </View>
       <Text style={styles.greetings}> Hello, {userData.fname}</Text>
-      <TouchableOpacity style={styles.inputContainer} onPress={() => navigation.navigate('Search')}>
+      <TouchableOpacity style={styles.inputContainer} onPress={() => navigation.navigate('TabNavigator', { screen: 'Search' })}>
       <FontAwesome
       name='search'
       size={20}
@@ -75,13 +76,14 @@ export default function Home(route) {
         <Text style={styles.subHeading}>Recommended Tutors</Text>
         <Entypo name="chevron-down" size={24} color="black" style={styles.subIcon}/>
       </TouchableOpacity>
+      <View style={{ height: 200 }}>
       <FlatList
       horizontal
       showsHorizontalScrollIndicator={false}
       data={tutor}
       keyExtractor={(item) => item._id}
       renderItem={({item}) => (
-        <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item})} style={styles.tutorCard}>
+        <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item, userName: userData.fname, userEmail: userData.email})} style={styles.tutorCard}>
           <FontAwesome style={styles.icon2} name='user-circle-o' size={24}/>
           <Text style={styles.text1}>{item.fname}</Text>
           <Text style={styles.texts}>{item.level}</Text>
@@ -89,8 +91,21 @@ export default function Home(route) {
         </TouchableOpacity>
       )}
       />
+      </View>
+        <Text style={styles.subHeading1}>Suggested Courses:</Text>
+        <View style={styles.suggestedCourses}>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Calculus I' })}} style={styles.courseContainer}><Text style={styles.text1}>Calculus I</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Calculus II' })}} style={styles.courseContainer}><Text style={styles.text1}>Calculus II</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Calculus III' })}} style={styles.courseContainer}><Text style={styles.text1}>Calculus III</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Algebra and Trigonometry' })}} style={styles.courseContainer}><Text style={styles.text1}>Algebra and Trigonometry</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Vectors and Geometry' })}} style={styles.courseContainer}><Text style={styles.text1}>Vectors and Geometry</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'BioChemistry' })}} style={styles.courseContainer}><Text style={styles.text1}>BioChemistry </Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Vectors and Mechanics' })}} style={styles.courseContainer}><Text style={styles.text1}>Vectors and Mechanics </Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Discrete Mathematics' })}} style={styles.courseContainer}><Text style={styles.text1}>Discrete Mathematics</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {navigation.navigate('Search', { searchQuery: 'Differential Equations' })}} style={styles.courseContainer}><Text style={styles.text1}>Differential Equations</Text></TouchableOpacity>
+        </View>
       <StatusBar barStyle="dark-content" />
-    </View>
+    </ScrollView>
   )
 }
 
@@ -98,6 +113,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#fff',
+      paddingBottom: 20,
     },
     header:{
       flexDirection: 'row',  
@@ -185,4 +201,23 @@ const styles = StyleSheet.create({
     texts:{
       color: 'black',
     },
+    subHeading1:{
+      fontWeight: 'bold',
+      marginTop: 35,
+      marginLeft: 20,
+      marginBottom: 20
+    },
+    suggestedCourses:{
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-around'
+    },
+    courseContainer:{
+      width: 122,
+      height: 52,
+      borderRadius: 10,
+      backgroundColor: '#d9d9d9',
+      marginBottom: 20,
+      paddingTop: 10
+    }
   });

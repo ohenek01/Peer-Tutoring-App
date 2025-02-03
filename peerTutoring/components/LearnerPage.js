@@ -6,9 +6,9 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function TutorPage() {
+export default function LearnerPage() {
     const [userData, setUserData] = useState(null);
-    const [tutor, setTutor] = useState([]);
+    const [learner, setLearner] = useState([]);
     const navigation = useNavigation();
 
     const fetchUserProfile = async() => {
@@ -29,14 +29,14 @@ export default function TutorPage() {
         }
       }
 
-    const fetchTutors = async() => {
+      const fetchLearners = async () => {
         try {
-            const res = await axios.get('http://172.20.10.6:5001/tutors');
-            setTutor(res.data.data)
+            const res = await axios.get('http://172.20.10.6:5001/learners');
+            setLearner(res.data.data)
         } catch (error) {
-            console.error('Error fetching Tutors', error)
+            console.error('Error fetching Learners:', error)
         }
-    }
+      }
 
     useEffect(() => {
         const loadData = async() => {
@@ -45,7 +45,7 @@ export default function TutorPage() {
           };
           loadData();
 
-        fetchTutors();
+        fetchLearners();
     },[])
   return (
     <View style={styles.container}>
@@ -53,10 +53,10 @@ export default function TutorPage() {
             <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Entypo name="chevron-left" size={50} color="black" style={styles.icon}/>
             </TouchableOpacity>
-            <Text style={styles.title}>Tutors</Text>
+            <Text style={styles.title}>Learners</Text>
         </View>
         <FlatList
-        data={tutor}
+        data={learner}
         keyExtractor={(item) => item._id}
         numColumns={2}
         renderItem={({item}) => (
@@ -64,7 +64,7 @@ export default function TutorPage() {
                 <FontAwesome name='user-circle-o' style={styles.icon1} size={24}/>
                 <Text style={styles.text1}>{item.fname}</Text>
                 <Text>{item.level}</Text>
-                <Text>{item.expertise}</Text>
+                <Text>{item.course}</Text>
             </TouchableOpacity>
         )}
         />

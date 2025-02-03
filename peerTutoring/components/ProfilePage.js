@@ -5,33 +5,30 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Profile({ route }) {
-  const { email } = route.params;
-  const [level, setLevel] = useState('');
-  const [course, setCourse] = useState('');
+export default function ProfilePage({ route }) {
   const [userData, setUserData] = useState(null);
   const navigation = useNavigation();
 
-  const handleSubmit = () => {
-    if(!level || !course){
-      alert('Level and Course fields are required');
-      return;
-    }
+//   const handleSubmit = () => {
+//     if(!level || !course){
+//       alert('Level and Course fields are required');
+//       return;
+//     }
 
-    const userData = { email, level, course};
+//     const userData = { email, level, course};
 
-    axios.put('http://172.20.10.6:5001/profile', userData)
-    .then(res => {
-      if(res.data.status === 'Ok'){
-        Alert.alert('Successful', 'Welcome!')
-        navigation.replace('TabNavigator', { screen: 'Home' });
-      }
-    })
-    .catch(error => {
-      console.error(error)
-      Alert.alert('Error', 'Something went wrong')
-    })
-  }
+//     axios.put('http://172.20.10.6:5001/profile', userData)
+//     .then(res => {
+//       if(res.data.status === 'Ok'){
+//         Alert.alert('Successful', 'Welcome!')
+//         navigation.replace('TabNavigator', { screen: 'Home' });
+//       }
+//     })
+//     .catch(error => {
+//       console.error(error)
+//       Alert.alert('Error', 'Something went wrong')
+//     })
+//   }
 
   const fetchUserProfile = async() => {
     try {
@@ -74,18 +71,16 @@ export default function Profile({ route }) {
         <Text style={styles.smallTexts}>Level:</Text>
         <TextInput style={styles.input}
           placeholder='100'
-          value={level}
-          onChangeText={setLevel}
+          value={`${userData.level}`}
         />
         <Text style={styles.smallTexts}>Course:</Text>
         <TextInput style={styles.input}
           placeholder='Mathematical Science'
-          value={course}
-          onChangeText={setCourse}
+          value={`${userData.course}`}
         />
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        {/* <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.smallTexts1}>Save and Continue</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
     </View>
   )
 }

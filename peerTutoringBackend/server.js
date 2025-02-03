@@ -169,12 +169,15 @@ app.get('/learners', async (req, res) => {
 
 // search functionality
 app.get('/search', async(req, res) => {
-    const { expertise } = req.query;
-    if(!expertise){
+    let { expertise } = req.query;
+    if(!expertise || expertise.trim() === ''){
         return res.status(400).send({status: 'Error', data: 'Expertise is required'})
     }
+    expertise = expertise.trim();
+    const words = expertise.split(" ");
+    const regexQueries = words.map(word => ({ expertise: { $regex: word, $options: 'i' } }));
     try {
-        const tutors = await User.find({expertise: {$regex: expertise, $options: 'i'}});
+        const tutors = await User.find({ $or: regexQueries });
         if(tutors.length === 0){
             return res.status(404).send({status: 'Error', data: 'No tutors found for this subject'})
         }
@@ -190,30 +193,74 @@ app.post('/message', async(req, res) => {
     const { sender, receiver, message } = req.body;
 
     try{
-    const newMessage = await Message.create({
-        sender, message, receiver
-    })
-    pusher.trigger(`private-chat-${sender}-${receiver}`, 'new-message',{
-        sender: sender,
-        receiver: receiver,
-        message: message
-    });
-    res.send({status: 'Message sent', data: newMessage})
-}catch(error){
+        const senderUser = await User.findOne({email: sender});
+        const receiverUser = await User.findOne({email: receiver});
+        if(!senderUser || !receiverUser){
+            return res.status(404).send({status: 'Error', data: 'User not found'})
+        }
+
+        const existingMessage = await Message.findOne({
+            $or: [
+                { sender: senderUser._id, receiver: receiverUser._id },
+                { sender: receiverUser._id, receiver: senderUser._id }
+            ]
+        });
+
+        const newMessage = await Message.create({
+        sender: senderUser._id, 
+        receiver: receiverUser._id, 
+        message
+        });
+        console.log('New message created:', newMessage);
+        console.log('Broadcasting new message:', {
+            sender: senderUser ._id,
+            receiver: receiverUser ._id,
+            message,
+        });
+        
+        pusher.trigger(`private-chat-${senderUser._id}-${receiverUser._id}`, 'new-message',{
+            sender: senderUser._id,
+            receiver: receiverUser._id,
+            message,
+        });
+        res.send({status: 'Message sent', data: newMessage})
+    }catch(error){
     console.error('Error sending message:', error)
     res.status(500).send({ status: 'Error', data: 'Failed to send message' })
 }
 });
 
 app.get('/message', async (req, res) => {
+    console.log('Received request for messages:', req.query);
     const { sender, receiver } = req.query;
     try {
+        console.log('Sender:', sender); 
+        console.log('Receiver:', receiver);
+
+        const senderUser = await User.findOne({email: sender});
+        console.log('Sender User:', senderUser );
+        
+        const receiverUser = await User.findOne({email: receiver});
+        console.log('Receiver User:', receiverUser ); 
+
+        if(!senderUser || !receiverUser){
+            return res.status(404).send({status: 'Error', data: 'User not found'})
+        }
+
         const message = await Message.find({
             $or:[
-                { sender, receiver },
-                { sender: sender, receiver: receiver, }
+                { sender:senderUser._id, receiver:receiverUser._id },
+                { sender: receiverUser._id, receiver: senderUser._id, }
             ],
         }).sort({ timeStamp: 1 })
+        .populate('sender', 'fname lname email')
+        .populate('receiver', 'fname lname email');
+
+        if(message.length === 0){
+            return res.status(200).send({status: 'OK', data: []});
+        }
+
+        res.status(200).send({status: 'OK', data: message})
     } catch (error) {
         console.error('Error fetching messages:', error)
         res.status(500).send({status: 'Error', data: 'Failed to fetch messages'})

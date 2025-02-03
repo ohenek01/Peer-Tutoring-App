@@ -1,11 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { Component, useState } from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import React, { Component, useState, useEffect } from 'react'
+import { Text, View, StyleSheet, Platform, TouchableOpacity, FlatList, StatusBar } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import Entypo from '@expo/vector-icons/Entypo';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function TutorHome  (){
     const [userData, setUserData] = useState(null);
-    const [learner, setLearner] = useState;
-    const navigation = useNavigation;
+    const [learner, setLearner] = useState([]);
+    const navigation = useNavigation();
 
     const fetchUserProfile = async() => {
         try {
@@ -23,7 +27,7 @@ export default function TutorHome  (){
           console.error('Error fetching user data', error)
           throw error;
         }
-      }
+      };
 
       const fetchLearners = async () => {
         try {
@@ -44,6 +48,10 @@ export default function TutorHome  (){
           fetchLearners();
         }, []);
 
+        if(!userData){
+            return <Text style={styles.smallTexts}>No user data found</Text>
+          }
+
     return (
         <View style={styles.container}>
         <View style={styles.header}>
@@ -62,7 +70,7 @@ export default function TutorHome  (){
           <Text style={styles.placeholder}>Search...</Text>
         </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.subContainer} onPress={() => navigation.navigate('TutorPage')}>
+        <TouchableOpacity style={styles.subContainer} onPress={() => navigation.navigate('LearnerPage')}>
           <Text style={styles.subHeading}>Learners</Text>
           <Entypo name="chevron-down" size={24} color="black" style={styles.subIcon}/>
         </TouchableOpacity>
@@ -72,11 +80,11 @@ export default function TutorHome  (){
         data={learner}
         keyExtractor={(item) => item._id}
         renderItem={({item}) => (
-          <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item})} style={styles.tutorCard}>
+          <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item, userName: userData.fname, userEmail: userData.email})} style={styles.tutorCard}>
             <FontAwesome style={styles.icon2} name='user-circle-o' size={24}/>
             <Text style={styles.text1}>{item.fname}</Text>
             <Text style={styles.texts}>{item.level}</Text>
-            <Text style={styles.texts}>{item.expertise}</Text>
+            <Text style={styles.texts}>{item.course}</Text>
           </TouchableOpacity>
         )}
         />

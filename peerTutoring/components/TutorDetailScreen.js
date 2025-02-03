@@ -5,7 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { StyleSheet, Platform, TouchableOpacity, View, Text, SafeAreaView } from 'react-native'
 
 export default function TutorDetailScreen({ route }) {
-    const { tutor } = route.params;
+    const { tutor, userName, userEmail } = route.params;
     const navigation = useNavigation();
   return (
     <View style={styles.container}>
@@ -23,7 +23,7 @@ export default function TutorDetailScreen({ route }) {
         <Text style={styles.texts}>Level: {tutor.level}</Text>
         <Text style={styles.texts}>Expertise: {tutor.expertise}</Text>
         <Text style={styles.texts}>Availability: {Array.isArray(tutor.availability) ? tutor.availability.join(', ') : 'Not Available'}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('ChatScreen',{sender: 'User1', receiver: tutor.fname})} style={styles.button}>
+        <TouchableOpacity onPress={() => navigation.navigate('ChatScreen',{sender: userEmail, receiver: tutor.email, userName})} style={styles.button}>
             <Text style={styles.buttonText}>Message</Text>
         </TouchableOpacity>
     </View>

@@ -1,23 +1,59 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, Platform,TextInput, Text, TouchableOpacity, FlatList } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
-export default function SearchPage() {
+export default function SearchPage( {route} ) {
     const [searchQuery, setSearchQuery] = useState('');
     const [tutors, setTutor] = useState([]);
+    const [searchAttempted, setSearchAttempted] = useState(false);
     const navigation = useNavigation();
+    const { searchQuery: initialSearchQuery } = route.params || {};
 
-    const searchTutor = async() => {
+    const searchTutor = async () => {
+        if (!searchQuery.trim()) {
+            alert("Please enter a valid search term.");
+            setTutor([]); // Clear results if search query is empty
+            return;
+        }
         try {
-            const res = await axios.get(`http://172.20.10.6:5001/search?expertise=${searchQuery}`);
-            setTutor(res.data.data)
+            const res = await axios.get(`http://172.20.10.6:5001/search?expertise=${encodeURIComponent(searchQuery)}`);
+            setTutor(res.data.data);
+            setSearchAttempted(true);
         } catch (error) {
             console.error('Error finding tutors', error);
+            alert('Error finding tutors')
         }
     }
+
+    const handleSubmit = () => {
+        setSearchAttempted(true); // Mark that the search is attempted
+        searchTutor();
+    };
+
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setTutor([]);  // Clear results when search is empty
+            return;
+        }
+
+        const delayDebounce = setTimeout(() => {
+            searchTutor();
+        }, 500);  // Adjust delay time if needed (500ms is a good default)
+
+        // Cleanup function to clear timeout if searchQuery changes before the delay
+        return () => clearTimeout(delayDebounce);
+    }, [searchQuery]);
+
+    // Update search query if initialSearchQuery is provided (for example, from navigation)
+    useEffect(() => {
+        if (initialSearchQuery && initialSearchQuery.trim() !== '') {
+            setSearchQuery(initialSearchQuery);
+        }
+    }, [initialSearchQuery]);
+
   return (
     <View style={styles.container}>
         <View style={styles.header}>
@@ -38,9 +74,15 @@ export default function SearchPage() {
             placeholder='Search...'
             value={searchQuery}
             onChangeText={setSearchQuery}
-            onSubmitEditing={searchTutor}
+            onSubmitEditing={handleSubmit}
             />
         </View>
+        {/* Show no tutors message when there are no results and searchQuery is not empty */}
+        {tutors.length === 0 && searchQuery.trim() !== '' && (
+                <Text style={{ textAlign: 'center', marginTop: 20, color: 'gray' }}>
+                    No tutors found for "{searchQuery}"
+                </Text>
+            )}
         <FlatList
         data={tutors}
         keyExtractor={(item) => item._id}

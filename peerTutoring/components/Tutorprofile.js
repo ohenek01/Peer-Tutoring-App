@@ -25,8 +25,8 @@ export default function Tutorprofile({ route }) {
     axios.put('http://172.20.10.6:5001/profile', userData)
     .then(res => {
       if(res.data.status === 'Ok'){
-        Alert.alert('Successful', 'Welcome!')
-        navigate.replace('Home')
+        Alert.alert('Success', 'Welcome!')
+        navigate.replace('TutorHome')
       }
     })
     .catch(error => {

@@ -1,8 +1,16 @@
 const { mongoose, collection } = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
-    sender: {type: String, required: true},
-    receiver: {type: String, required: true},
+    sender: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'userInfo', 
+        required: true,
+
+    },
+    receiver: {
+        type: mongoose.Schema.Types.ObjectId, 
+        required: true
+    },
     message: {type: String, required: true}
 },{
     collection: 'Message',
