@@ -80,7 +80,7 @@ export default function TutorHome  (){
         data={learner}
         keyExtractor={(item) => item._id}
         renderItem={({item}) => (
-          <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item, userName: userData.fname, userEmail: userData.email})} style={styles.tutorCard}>
+          <TouchableOpacity onPress={() => navigation.navigate('LearnerDetailScreen', {tutor: item, userName: userData.fname, userEmail: userData.email})} style={styles.tutorCard}>
             <FontAwesome style={styles.icon2} name='user-circle-o' size={24}/>
             <Text style={styles.text1}>{item.fname}</Text>
             <Text style={styles.texts}>{item.level}</Text>

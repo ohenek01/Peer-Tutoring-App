@@ -267,6 +267,69 @@ app.get('/message', async (req, res) => {
     }
 })
 
+app.get('/chatted-users', async (req, res) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).send({ status: 'Error', data: 'Authorization token required' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findOne({ email: decoded.email });
+
+        if (!user) {
+            return res.status(404).send({ status: 'Error', data: 'User not found' });
+        }
+
+        // Find distinct users the current user has chatted with
+        const chattedUsers = await Message.aggregate([
+            {
+                $match: {
+                    $or: [{ sender: user._id }, { receiver: user._id }]
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $cond: [
+                            { $eq: ["$sender", user._id] },
+                            "$receiver",
+                            "$sender"
+                        ]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "userInfo",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {
+                $unwind: "$user"
+            },
+            {
+                $project: {
+                    _id: 0,
+                    userId: "$user._id",
+                    name: { $concat: ["$user.fname", " ", "$user.lname"] },
+                    email: "$user.email"
+                }
+            }
+        ]);
+
+        res.status(200).send({ status: 'Ok', data: chattedUsers });
+    } catch (error) {
+        console.error('Error fetching chatted users:', error);
+        res.status(500).send({ status: 'Error', data: 'Failed to fetch chatted users' });
+    }
+});
+
+
+
 app.listen(5001, () => {
     console.log("Server has Started")
 })

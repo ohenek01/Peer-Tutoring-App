@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { View, StyleSheet, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -60,7 +60,11 @@ export default function Profile({ route }) {
   }, []);
 
   if(!userData){
-    return <Text style={styles.smallTexts}>No user data found</Text>
+    return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size="large" color="#0000ff" />
+    </View>
+  )
   }
 
   return (

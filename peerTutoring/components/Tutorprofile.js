@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { View, StyleSheet, Text, TextInput, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Alert, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -26,7 +26,7 @@ export default function Tutorprofile({ route }) {
     .then(res => {
       if(res.data.status === 'Ok'){
         Alert.alert('Success', 'Welcome!')
-        navigate.replace('TutorHome')
+        navigate.replace('TabNavigator', { screen: 'TutorHome' });
       }
     })
     .catch(error => {
@@ -72,7 +72,11 @@ export default function Tutorprofile({ route }) {
           }, []);
 
           if(!userData){
-            return <Text>No user data found</Text>
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              )
           }
 
   return (

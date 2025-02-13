@@ -4,7 +4,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { StyleSheet, Platform, TouchableOpacity, View, Text, SafeAreaView } from 'react-native'
 
-export default function TutorDetailScreen({ route }) {
+export default function LearnerDetailScreen({ route }) {
     const { tutor, userName, userEmail } = route.params;
     const navigation = useNavigation();
   return (
@@ -21,8 +21,7 @@ export default function TutorDetailScreen({ route }) {
         />
         <Text style={styles.text1}>{tutor.fname}</Text>
         <Text style={styles.texts}>Level: {tutor.level}</Text>
-        <Text style={styles.texts}>Expertise: {tutor.expertise}</Text>
-        <Text style={styles.texts}>Availability: {Array.isArray(tutor.availability) ? tutor.availability.join(', ') : 'Not Available'}</Text>
+        <Text style={styles.texts}>Course: {tutor.course}</Text>
         <TouchableOpacity onPress={() => navigation.navigate('ChatScreen',{sender: userEmail, receiver: tutor.email, userName: tutor.fname})} style={styles.button}>
             <Text style={styles.buttonText}>Message</Text>
         </TouchableOpacity>

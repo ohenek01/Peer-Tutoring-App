@@ -26,7 +26,7 @@ export default function Login( {route} ) {
 
             // Save token to AsyncStorage
             await AsyncStorage.setItem('userToken', token);
-
+            await AsyncStorage.setItem('userEmail', email);
             alert('Login Successful');
 
             // Navigate based on role

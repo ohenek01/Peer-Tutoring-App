@@ -60,7 +60,7 @@ export default function LearnerPage() {
         keyExtractor={(item) => item._id}
         numColumns={2}
         renderItem={({item}) => (
-            <TouchableOpacity onPress={() => navigation.navigate('TutorDetailScreen', {tutor: item, userName: userData.fname, userEmail: userData.email})} style={styles.tutorCard}>
+            <TouchableOpacity onPress={() => navigation.navigate('LearnerDetailScreen', {tutor: item, userName: userData.fname, userEmail: userData.email})} style={styles.tutorCard}>
                 <FontAwesome name='user-circle-o' style={styles.icon1} size={24}/>
                 <Text style={styles.text1}>{item.fname}</Text>
                 <Text>{item.level}</Text>

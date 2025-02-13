@@ -12,84 +12,112 @@ export default function ChatScreen  ({route}){
     const {sender, receiver, userName} = route.params;
     const navigation = useNavigation();
 
-    console.log('Sender in ChatScreen:', sender);
-    console.log('Receiver in ChatScreen:', receiver);
-    console.log('UserName in ChatScreen:', userName);
-
     const channelRef = useRef(null);
 
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                if(!sender || !receiver){
-                    console.error('Sender or Receiver is missing');
-                    return;
-                }
-                console.log('Fetching messages for:', { sender, receiver });
-                const res = await axios.get('http://172.20.10.6:5001/message',{
+                if (!sender || !receiver) return;
+                
+                const res = await axios.get('http://172.20.10.6:5001/message', {
                     params: { sender, receiver }
                 });
-                if(res.data && res.data.data && res.data.data.length > 0){
-                setMessages(res.data.data)
-            }else{
+
+                if (res.data && res.data.data) {
+                    const formattedMessages = res.data.data
+                        .map((msg) => ({
+                            ...msg,
+                            senderEmail: msg.sender.email,
+                            createdAt: new Date(msg.createdAt)
+                        }))
+                        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+                    
+                    setMessages(formattedMessages);
+                } else {
+                    setMessages([]);
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
                 setMessages([]);
             }
-            } catch (error) {
-                console.error('Error fetching messages:', error.response ? error.response.data : error.message);
-                setMessages([]); 
+        };
+
+        // Fetch messages immediately and set up interval
+        fetchMessages();
+        const interval = setInterval(fetchMessages, 5000);
+
+        return () => {
+            clearInterval(interval);
+            if (channelRef.current) {
+                channelRef.current.unsubscribe();
             }
         };
-        fetchMessages();
+    }, [sender, receiver]);
 
-    try{   
-        const pusher = new Pusher('61b2bc1b9e24dce99794',{
+    useEffect(() => {
+        const pusher = new Pusher('61b2bc1b9e24dce99794', {
             cluster: 'mt1'
         });
 
         const channel = `private-chat-${sender}-${receiver}`;
-
         channelRef.current = pusher.subscribe(channel);
+
         channelRef.current.bind('new-message', (data) => {
-            console.log('New message received:', data);
-            // Ensure the data has the correct structure
             if (data && data.sender && data.message) {
-                setMessages((prevMessages) => [...prevMessages, { sender: data.sender, message: data.message }]);
-            } else {
-                console.error('Received message data is not in the expected format:', data);
+                const newMsg = {
+                    sender: data.sender,
+                    receiver: receiver,
+                    message: data.message,
+                    senderEmail: data.sender.email || '',
+                    createdAt: new Date()
+                };
+                
+                setMessages(prev => {
+                    const updatedMessages = [...prev, newMsg];
+                    updatedMessages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+                    return updatedMessages;
+                });
             }
         });
-    }catch(error){
-        console.error('Error with pusher subscription', error)
-    }
-        
+
         return () => {
-            if(channelRef.current){
+            if (channelRef.current) {
                 channelRef.current.unbind_all();
-                channelRef.current.unsubscribe(channelRef);
+                channelRef.current.unsubscribe();
             }
         };
     }, [sender, receiver]);
 
     const sendMessage = async () => {
-        if (!newMessage.trim()) return; // Prevent sending empty messages
-        const token = AsyncStorage.getItem('userToken')
-
-        const message = { sender, receiver, message: newMessage };
+        if (!newMessage.trim()) return;
+        
         try {
-            console.log('Sending message:', message)
-            await axios.post('http://172.20.10.6:5001/message',{
+            const res = await axios.post('http://172.20.10.6:5001/message', {
                 sender: sender,
                 receiver: receiver,
                 message: newMessage,
-            },{
-                headers: { 'Content-Type': 'application/json' },
             });
-            setMessages((prevMessages) => [...prevMessages, message]);
-            setNewMessage('')
+
+            if (res.data) {
+                const message = {
+                    sender: sender,
+                    receiver: receiver,
+                    message: newMessage,
+                    senderEmail: sender.email,
+                    createdAt: new Date()
+                };
+                
+                setMessages(prev => {
+                    const updatedMessages = [...prev, message];
+                    updatedMessages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+                    return updatedMessages;
+                });
+                setNewMessage('');
+            }
         } catch (error) {
-            console.error('Error fetching messages:', error.response ? error.response.data : error.message);
+            console.error('Error sending message:', error);
         }
-    }
+    };
 
     return (
       <View style={styles.container}>
@@ -105,16 +133,14 @@ export default function ChatScreen  ({route}){
             ListEmptyComponent={<Text>Start a conversation!</Text>}
             renderItem={({item}) => {
                 const isSender = item.sender.email === sender;
-                console.log('Message sender:', item.sender.email);
-                console.log('Current user (sender):', sender);
-                console.log('Is sender:', isSender);
                 return(
                 <View style={[styles.messageContainer, isSender ? styles.senderContainer : styles.receiverContainer]}>
                 <View style={[styles.message, isSender ? styles.senderMessage : styles.receiverMessage]}>
-                    <Text style={styles.messageText}>{item.sender.fname}: {item.message}</Text>
+                    <Text style={styles.messageText}> {item.sender.email}:{item.message}</Text>
                 </View>
                 </View>
             )}}
+            
             />
             <View style={styles.inputContainer}>
                 <TextInput
@@ -146,7 +172,7 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? 55 : undefined
     },
     receiverName:{
-        marginLeft: 140,
+        marginLeft: 120,
         fontWeight: 'bold',
         fontSize: 25
     },
@@ -156,11 +182,11 @@ const styles = StyleSheet.create({
     receiverMessage:{
         backgroundColor: '#d9d9d9'
     },
-    senderContainer:{
-        justifyContent: 'flex-end',
+    senderContainer: {
+        alignSelf: 'flex-end', // Align sender's message to the right
     },
-    receiverContainer:{
-        justifyContent: 'flex-start',
+    receiverContainer: {
+        alignSelf: 'flex-start', // Align receiver's message to the left
     },
     inputContainer:{
         flexDirection: 'row',
@@ -180,6 +206,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         borderRadius: 5,
         maxWidth: '80%',
+        maxHeight: '100%'
     },
     messageText:{
         width: 200

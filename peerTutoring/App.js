@@ -17,7 +17,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import ProfilePage from './components/ProfilePage';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Feather from '@expo/vector-icons/Feather';
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { ActivityIndicator, View } from 'react-native';
+import LearnerDetailScreen from './components/LearnerDetailScreen';
+import ChatPage from './components/ChatPage';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,7 +33,7 @@ function TabNavigator() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Home" 
-      component={Home} 
+      component={HomeTab} 
       options={{ 
         headerShown: false, 
         tabBarIcon: ({color, size}) => (
@@ -42,7 +49,16 @@ function TabNavigator() {
            <FontAwesome name="search" size={24} color="black" />
         )
       }} />
-      <Tab.Screen name="Profile" 
+        <Tab.Screen name= "Chats"
+        component = {ChatPage}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({color, size}) => (
+            <Ionicons name="chatbubbles" size={24} color="black" />
+          )
+        }}
+        />
+        <Tab.Screen name="Profile" 
       component={ProfilePage} 
       options={{ 
         headerShown: false, 
@@ -52,6 +68,42 @@ function TabNavigator() {
         }} />
     </Tab.Navigator>
   );
+}
+
+function HomeTab({ navigation }) {
+  const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUserRole = useCallback(async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) throw new Error('Token not found');
+
+      const res = await axios.get('http://172.20.10.6:5001/profile', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUserRole(res.data.data.role);
+    } catch (error) {
+      console.error('Error fetching Role:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUserRole();
+  }, [fetchUserRole]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  return userRole === 'Tutor' ? <TutorHome /> : <Home />;
 }
 
 export default function App() {
@@ -68,6 +120,7 @@ export default function App() {
         <Stack.Screen name='TutorPage' component={TutorPage} options={{headerShown: false}}/>
         <Stack.Screen name='LearnerPage' component={LearnerPage} options={{headerShown: false}}/>
         <Stack.Screen name='TutorDetailScreen' component={TutorDetailScreen} options={{headerShown: false}}/>
+        <Stack.Screen name='LearnerDetailScreen' component={LearnerDetailScreen} options={{headerShown: false}}/>
         <Stack.Screen name='ChatScreen' component={ChatScreen} options={{headerShown: false}}/>
         <Stack.Screen
           name="TabNavigator"

@@ -29,7 +29,7 @@ export default function Role({ route }) {
           navigate.replace('Login', { fname, lname, role })
         }else{
           Alert.alert('Error', res.data.data || 'Failed to register role');
-        }
+        };
       })
       .catch(error => {
         console.error(error);
