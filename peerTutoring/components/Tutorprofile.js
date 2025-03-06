@@ -26,7 +26,7 @@ export default function Tutorprofile({ route }) {
     .then(res => {
       if(res.data.status === 'Ok'){
         Alert.alert('Success', 'Welcome!')
-        navigate.replace('TabNavigator', { screen: 'TutorHome' });
+        navigate.replace('TabNavigator', { screen: 'HomeTab' });
       }
     })
     .catch(error => {
@@ -107,25 +107,25 @@ export default function Tutorprofile({ route }) {
         />
         <Text style={styles.smallTexts}>Availability:</Text>
         <View style={styles.availability}>
-        <TouchableOpacity style={styles.button1} onPress={() => toggleAvailability('Monday')}>
+        <TouchableOpacity style={[styles.button1, availability.includes('Monday') && styles.selectedButton]} onPress={() => toggleAvailability('Monday')}>
           <Text style={styles.buttonTexts}>Monday</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button1} onPress={() => toggleAvailability('Tuesday')}>
+        <TouchableOpacity style={[styles.button1, availability.includes('Tuesday') && styles.selectedButton]} onPress={() => toggleAvailability('Tuesday')}>
           <Text style={styles.buttonTexts}>Tuesday</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button1} onPress={() => toggleAvailability('Wednesday')}>
+        <TouchableOpacity style={[styles.button1, availability.includes('Wednesday') && styles.selectedButton]} onPress={() => toggleAvailability('Wednesday')}>
           <Text style={styles.buttonTexts}>Wednesday</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button1} onPress={() => toggleAvailability('Thursday')}>
+        <TouchableOpacity style={[styles.button1, availability.includes('Thursday') && styles.selectedButton]} onPress={() => toggleAvailability('Thursday')}>
           <Text style={styles.buttonTexts}>Thursday</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button1} onPress={() => toggleAvailability('Friday')}>
+        <TouchableOpacity style={[styles.button1, availability.includes('Friday') && styles.selectedButton]} onPress={() => toggleAvailability('Friday')}>
           <Text style={styles.buttonTexts}>Friday</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button1} onPress={() => toggleAvailability('Saturday')}>
+        <TouchableOpacity style={[styles.button1, availability.includes('Saturday') && styles.selectedButton]} onPress={() => toggleAvailability('Saturday')}>
           <Text style={styles.buttonTexts}>Saturday</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button1} onPress={() => toggleAvailability('Sunday')}>
+        <TouchableOpacity style={[styles.button1, availability.includes('Sunday') && styles.selectedButton]} onPress={() => toggleAvailability('Sunday')}>
           <Text style={styles.buttonTexts}>Sunday</Text>
         </TouchableOpacity>
         </View>
@@ -200,5 +200,8 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'space-evenly',
+    },
+    selectedButton: {
+      backgroundColor: 'gray',
     },
 })    

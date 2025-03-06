@@ -92,7 +92,7 @@ export default function ChatScreen  ({route}){
         if (!newMessage.trim()) return;
         
         try {
-            const res = await axios.post('http://172.20.10.6:5001/message', {
+            const res = await axios.post('http://192.168.0.102:5001/message', {
                 sender: sender,
                 receiver: receiver,
                 message: newMessage,
