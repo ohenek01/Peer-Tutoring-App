@@ -18,7 +18,7 @@ export default function Home(route) {
       if(!token){
         throw new Error('Token not found');
       }
-      const res = await axios.get('http://172.20.10.6:5001/profile', {
+      const res = await axios.get('http://192.168.0.102:5001/profile', {
         headers:{
           Authorization: `Bearer ${token}`
         }
@@ -32,7 +32,7 @@ export default function Home(route) {
 
   const fetchTutors = async() => {
     try {
-      const res = await axios.get('http://172.20.10.6:5001/tutors');
+      const res = await axios.get('http://192.168.0.102:5001/tutors');
       const randomTutors = res.data.data.sort(() => 0.5 - Math.random());
       setTutor(randomTutors.slice(0, 5));
     } catch (error) {

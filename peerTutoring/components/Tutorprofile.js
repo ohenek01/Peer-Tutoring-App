@@ -22,7 +22,7 @@ export default function Tutorprofile({ route }) {
 
     const userData = { email, level, course, expertise, availability};
 
-    axios.put('http://172.20.10.6:5001/profile', userData)
+    axios.put('http://192.168.0.102:5001/profile', userData)
     .then(res => {
       if(res.data.status === 'Ok'){
         Alert.alert('Success', 'Welcome!')
@@ -51,7 +51,7 @@ export default function Tutorprofile({ route }) {
               if(!token){
                 throw new Error('Token not found');
               }
-              const res = await axios.get('http://172.20.10.6:5001/profile', {
+              const res = await axios.get('http://192.168.0.102:5001/profile', {
                 headers:{
                   Authorization: `Bearer ${token}`
                 }

@@ -19,7 +19,7 @@ export default function SearchPage( {route} ) {
             return;
         }
         try {
-            const res = await axios.get(`http://172.20.10.6:5001/search?expertise=${encodeURIComponent(searchQuery)}`);
+            const res = await axios.get(`http://192.168.0.102:5001/search?expertise=${encodeURIComponent(searchQuery)}`);
             setTutor(res.data.data);
             setSearchAttempted(true);
         } catch (error) {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
       },
       icon1:{
         position: 'absolute',
-        top: '52%',
+        top: Platform.OS === 'android' ? '52%' : '40%',
         left: 18,
         transform: [{ translateY: -12 }],
         zIndex: 1

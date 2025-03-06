@@ -19,7 +19,7 @@ export default function ChatScreen  ({route}){
             try {
                 if (!sender || !receiver) return;
                 
-                const res = await axios.get('http://172.20.10.6:5001/message', {
+                const res = await axios.get('http://192.168.0.102:5001/message', {
                     params: { sender, receiver }
                 });
 

@@ -16,7 +16,7 @@ export default function Login( {route} ) {
     };
 
     try {
-        const res = await axios.post('http://172.20.10.6:5001/login', userData);
+        const res = await axios.post('http://192.168.0.102:5001/login', userData);
 
         // Log response for debugging
         console.log(res.data);

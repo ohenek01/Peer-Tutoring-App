@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import { View, ActivityIndicator, FlatList, TouchableOpacity, Text } from 'react-native'
+import { View, ActivityIndicator, FlatList, TouchableOpacity, Text, Platform } from 'react-native'
 import axios from 'axios'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -11,7 +11,7 @@ export default function ChatPage() {
 
     const fetchChattedUsers = async(token) => {
         try {
-            const res = await axios.get('http://172.20.10.6:5001/chatted-users',{
+            const res = await axios.get('http://192.168.0.102:5001/chatted-users',{
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('API Response:', res.data);  // Log full response
@@ -59,7 +59,7 @@ export default function ChatPage() {
     }
 return(
  <View style={{ flex: 1, padding: 20 }}>
-    <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Chats</Text>
+    <Text style={{ fontSize: 24, fontWeight: 'bold', marginTop: Platform.OS === 'ios' ? '40' : undefined, marginBottom: 20 }}>Chats</Text>
         <FlatList
             data={users}
             keyExtractor={(item) => item.userId}

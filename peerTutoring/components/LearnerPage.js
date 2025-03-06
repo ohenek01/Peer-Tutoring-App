@@ -17,7 +17,7 @@ export default function LearnerPage() {
           if(!token){
             throw new Error('Token not found');
           }
-          const res = await axios.get('http://172.20.10.6:5001/profile', {
+          const res = await axios.get('http://192.168.0.102:5001/profile', {
             headers:{
               Authorization: `Bearer ${token}`
             }
@@ -31,7 +31,7 @@ export default function LearnerPage() {
 
       const fetchLearners = async () => {
         try {
-            const res = await axios.get('http://172.20.10.6:5001/learners');
+            const res = await axios.get('http://192.168.0.102:5001/learners');
             setLearner(res.data.data)
         } catch (error) {
             console.error('Error fetching Learners:', error)
